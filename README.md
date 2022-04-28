@@ -28,12 +28,21 @@ Basically, the tool gets a list of your DNS records and checks if the pointed IP
 
 ## Installation
 ### Prerequisites
-- Install requirements based on requirements.txt
-  ```bash
-  pip install -r requirements.txt
-  ```
 - [Optional] To pull records from Prisma Cloud, copy 'credentials.py.example' to 'credentials.py' and fill
   the required variables
+  
+### PIP (recommended)
+```bash
+pip install ddfr
+```
+
+### Manual
+```bash
+git clone https://github.com/playtika/DDFR.git
+cd DDFR
+pip install .
+```
+  
 
 ---
 
