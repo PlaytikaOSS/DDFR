@@ -1,4 +1,4 @@
-# DDFR - Dangling DNS Records Finder
+# DDFR - Dangling Domains Finder
 
 > A lightweight Python utility to detect dns records that are suspected as dangling.
 
@@ -14,14 +14,14 @@ Basically, the tool gets a list of your DNS records and checks if the pointed IP
 
 ### Behind the scenes
 
-1. You provide DDRF with a list of your DNS records _(see Usage section)_.
+1. You provide DDFR with a list of your DNS records _(see Usage section)_.
 1. You provide DDFR with a list of all your registered cloud IPs in one of the following ways:
     - Allow DDFR to **automatically collect** all of your registered IPs from Palo Alto's Prisma Cloud product.
     - **Manually provide** a file with your registered cloud IPs.
 1. DDFR compares the lists to see if there are domains pointing to IPs not owned by you and therefore
   **suspected as dangling**.
     
-    _**NOTE:** DDRF also provides you with a mechanism to reduce false positives, read more about it below._
+    _**NOTE:** DDFR also provides you with a mechanism to reduce false positives, read more about it below._
 1. DDFR generates a report of the suspected DNS records.
 
 ---
