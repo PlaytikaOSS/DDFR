@@ -187,7 +187,7 @@ def is_certificate_mine(name):
     return False
 
 
-def main(domains_file, ranges_file, cns_file, ips_file, verify):
+def main(domains_file, ranges_file, cns_file, ips_file, verify, output_path):
     """
     The main method for the tool.
     :param domains_file:
@@ -230,7 +230,7 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify):
     # Headers for output CSV file.
     csv_headers = ['Domain', 'IP']
     # @todo Allow the user to control the output file's name.
-    csv_file = '../unclaimed-ips.csv'
+    csv_file = f"{output_path}/output.csv"
 
     try:
         writer = csv.DictWriter(open(csv_file, 'w', encoding='utf-8'), fieldnames=csv_headers)
@@ -257,6 +257,8 @@ def interactive():
     # Add the arguments.
     parser.add_argument('-d', '--domains', help='Path to domains file', dest='domains',
                         required=True)
+    parser.add_argument('-o', '--output', help='Full path to output directory', dest='output',
+                        required=True)
     parser.add_argument('-r', '--ranges', help='Path to AWS ranges file', dest='ranges',
                         required=True)
     parser.add_argument('-cn', '--ssl-common-names', help='Path to common names (CN) file for exclusion', dest='common',
@@ -271,7 +273,8 @@ def interactive():
          ranges_file=args.ranges,
          cns_file=args.common,
          ips_file=args.ips,
-         verify=args.verify
+         verify=args.verify,
+         output_path=args.output
          )
 
 

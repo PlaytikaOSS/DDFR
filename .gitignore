@@ -3,3 +3,4 @@ venv
 ddfr/credentials.py
 common-names.txt
 unclaimed-ips.csv
+output.csv

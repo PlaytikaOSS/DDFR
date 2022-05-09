@@ -28,8 +28,12 @@ Basically, the tool gets a list of your DNS records and checks if the pointed IP
 
 ## Installation
 ### Prerequisites
-- [Optional] To pull records from Prisma Cloud, copy 'credentials.py.example' to 'credentials.py' and fill
-  the required variables
+- [Optional] To pull records from Prisma Cloud, fill in the required environment variables:
+```bash
+export PRISMA_API_KEYID = your-value-here
+export PRISMA_API_SECRET = your-value-here
+export PRISMA_URL = your-value-here
+```
   
 ### PIP (recommended)
 ```bash
@@ -59,6 +63,7 @@ Short Form    | Long Form            | Description
 -i            | --ips                | Path to a file contains your owned ips (if non-existent will pull from prisma) 
 -cn           | --ssl-common-names   | Path to a file contains key words that should appear in your CNs (for reducing false positives)
 -r            | --ranges             | Path to a file contains AWS ip ranges
+-o            | --output             | Full path to output directory
 
 
 
