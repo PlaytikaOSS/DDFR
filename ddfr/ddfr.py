@@ -1,5 +1,5 @@
 import argparse
-import ddfr.credentials as credentials
+import os
 import requests
 import json
 import csv
@@ -19,11 +19,6 @@ RQL = {
         'dns': '''config from cloud.resource where api.name = 'gcloud-dns-managed-zone' addcolumn dnsName''',
     }
 }
-
-# Define our environment variables.
-PRISMA_URL = credentials.PRISMA_URL
-PRISMA_API_KEYID = credentials.PRISMA_API_KEYID
-PRISMA_API_SECRET = credentials.PRISMA_API_SECRET
 
 
 def get_prisma_token():
@@ -90,11 +85,14 @@ def get_prisma_ips(ips_file):
         except IOError:
             print(f'could not read file: {ips_file}')
             exit(2)
-    else:
+    elif PRISMA_URL and PRISMA_API_KEYID and PRISMA_API_SECRET:
         # Pulling ips from prisma cloud.
         data = get_prisma_config(RQL['aws']['ips'])
         for interface in data['items']:
             ips.append(interface['dynamicData']['association.publicIp'])
+    else:
+        print('didnt provided an ips file or Prisma config variables')
+        exit(2)
     return ips
 
 
@@ -206,6 +204,14 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify):
     global cns
     global verify_ssl
     verify_ssl = verify
+
+    # Define our environment variables.
+    global PRISMA_URL
+    global PRISMA_API_KEYID
+    global PRISMA_API_SECRET
+    PRISMA_URL = os.getenv('PRISMA_URL')
+    PRISMA_API_KEYID = os.getenv('PRISMA_API_KEYID')
+    PRISMA_API_SECRET = os.getenv('PRISMA_API_SECRET')
 
     # Trying to read data from provided files.
     try:
