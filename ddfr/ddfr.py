@@ -69,7 +69,7 @@ def get_prisma_config(query):
     return resp.json()['data']
 
 
-def get_prisma_ips(ips_file):
+def get_my_ips(ips_file):
     """
     Fetch IP addresses belongs to the company's AWS accounts from Prisma.
     :param ips_file:
@@ -200,7 +200,7 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify, output_path):
 
     # Initializing variables.
     global aws_ranges
-    global prisma_ips
+    global my_ips
     global cns
     global verify_ssl
     verify_ssl = verify
@@ -225,7 +225,7 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify, output_path):
     except IOError:
         print(f'could not read file: {ranges_file}')
         exit(2)
-    prisma_ips = get_prisma_ips(ips_file)
+    my_ips = get_my_ips(ips_file)
 
     # Headers for output CSV file.
     csv_headers = ['Domain', 'IP']
@@ -242,7 +242,7 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify, output_path):
                 if domain['record_type'] == 'CNAME' and str(domain['record_value']).startswith('ec2-'):
                     # Extracting ip from EC2 domain name.
                     ip = str(domain['record_value']).split('.')[0][4:].replace('-', '.')
-                if is_aws(ip) and ip not in prisma_ips and not is_certificate_mine(domain['name']):
+                if is_aws(ip) and ip not in my_ips and not is_certificate_mine(domain['name']):
                     # Record suspected as dangling.
                     write_row(writer, domain['record_value'], domain['name'])
 
