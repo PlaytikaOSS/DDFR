@@ -255,15 +255,15 @@ def interactive():
     parser = argparse.ArgumentParser(description='Execute unclaimed ips')
 
     # Add the arguments.
-    parser.add_argument('-d', '--domains', help='Path to domains file', dest='domains',
+    parser.add_argument('-d', '--domains', help='Full path to domains file', dest='domains',
                         required=True)
     parser.add_argument('-o', '--output', help='Full path to output directory', dest='output',
                         required=True)
-    parser.add_argument('-r', '--ranges', help='Path to AWS ranges file', dest='ranges',
+    parser.add_argument('-r', '--ranges', help='Full path to AWS ranges file', dest='ranges',
                         required=True)
-    parser.add_argument('-cn', '--ssl-common-names', help='Path to common names (CN) file for exclusion', dest='common',
+    parser.add_argument('-cn', '--ssl-common-names', help='Full path to common names (CN) file for exclusion', dest='common',
                         required=True)
-    parser.add_argument('-i', '--ips', help='Path to owned IPs file', default='', dest='ips',
+    parser.add_argument('-i', '--ips', help='Full path to owned IPs file', default='', dest='ips',
                         required=False)
     parser.add_argument('-v', '--skip-verify-ssl', help='Skip SSL verification for external HTTPS calls',
                         action='store_false', default=True, dest='verify', required=False)

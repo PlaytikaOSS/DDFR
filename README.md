@@ -59,10 +59,10 @@ DDFR was developed and tested only with __Python3__.
 
 Short Form    | Long Form            | Description
 ------------- | -------------------- |-------------
--d            | --domains            | Path to a file contains your DNS records
--i            | --ips                | Path to a file contains your owned ips (if non-existent will pull from prisma) 
--cn           | --ssl-common-names   | Path to a file contains key words that should appear in your CNs (for reducing false positives)
--r            | --ranges             | Path to a file contains AWS ip ranges
+-d            | --domains            | Full path to a file contains your DNS records
+-i            | --ips                | Full path to a file contains your owned ips (if non-existent will pull from prisma) 
+-cn           | --ssl-common-names   | Full path to a file contains key words that should appear in your CNs (for reducing false positives)
+-r            | --ranges             | Full path to a file contains AWS ip ranges
 -o            | --output             | Full path to output directory
 
 
