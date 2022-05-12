@@ -1,5 +1,5 @@
 import argparse
-import ddfr.credentials as credentials
+import os
 import requests
 import json
 import csv
@@ -19,11 +19,6 @@ RQL = {
         'dns': '''config from cloud.resource where api.name = 'gcloud-dns-managed-zone' addcolumn dnsName''',
     }
 }
-
-# Define our environment variables.
-PRISMA_URL = credentials.PRISMA_URL
-PRISMA_API_KEYID = credentials.PRISMA_API_KEYID
-PRISMA_API_SECRET = credentials.PRISMA_API_SECRET
 
 
 def get_prisma_token():
@@ -74,7 +69,7 @@ def get_prisma_config(query):
     return resp.json()['data']
 
 
-def get_prisma_ips(ips_file):
+def get_my_ips(ips_file):
     """
     Fetch IP addresses belongs to the company's AWS accounts from Prisma.
     :param ips_file:
@@ -90,11 +85,14 @@ def get_prisma_ips(ips_file):
         except IOError:
             print(f'could not read file: {ips_file}')
             exit(2)
-    else:
+    elif PRISMA_URL and PRISMA_API_KEYID and PRISMA_API_SECRET:
         # Pulling ips from prisma cloud.
         data = get_prisma_config(RQL['aws']['ips'])
         for interface in data['items']:
             ips.append(interface['dynamicData']['association.publicIp'])
+    else:
+        print('didnt provided an ips file or Prisma config variables')
+        exit(2)
     return ips
 
 
@@ -189,7 +187,7 @@ def is_certificate_mine(name):
     return False
 
 
-def main(domains_file, ranges_file, cns_file, ips_file, verify):
+def main(domains_file, ranges_file, cns_file, ips_file, verify, output_path):
     """
     The main method for the tool.
     :param domains_file:
@@ -202,10 +200,18 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify):
 
     # Initializing variables.
     global aws_ranges
-    global prisma_ips
+    global my_ips
     global cns
     global verify_ssl
     verify_ssl = verify
+
+    # Define our environment variables.
+    global PRISMA_URL
+    global PRISMA_API_KEYID
+    global PRISMA_API_SECRET
+    PRISMA_URL = os.getenv('PRISMA_URL')
+    PRISMA_API_KEYID = os.getenv('PRISMA_API_KEYID')
+    PRISMA_API_SECRET = os.getenv('PRISMA_API_SECRET')
 
     # Trying to read data from provided files.
     try:
@@ -219,12 +225,12 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify):
     except IOError:
         print(f'could not read file: {ranges_file}')
         exit(2)
-    prisma_ips = get_prisma_ips(ips_file)
+    my_ips = get_my_ips(ips_file)
 
     # Headers for output CSV file.
     csv_headers = ['Domain', 'IP']
     # @todo Allow the user to control the output file's name.
-    csv_file = '../unclaimed-ips.csv'
+    csv_file = f"{output_path}/output.csv"
 
     try:
         writer = csv.DictWriter(open(csv_file, 'w', encoding='utf-8'), fieldnames=csv_headers)
@@ -236,7 +242,7 @@ def main(domains_file, ranges_file, cns_file, ips_file, verify):
                 if domain['record_type'] == 'CNAME' and str(domain['record_value']).startswith('ec2-'):
                     # Extracting ip from EC2 domain name.
                     ip = str(domain['record_value']).split('.')[0][4:].replace('-', '.')
-                if is_aws(ip) and ip not in prisma_ips and not is_certificate_mine(domain['name']):
+                if is_aws(ip) and ip not in my_ips and not is_certificate_mine(domain['name']):
                     # Record suspected as dangling.
                     write_row(writer, domain['record_value'], domain['name'])
 
@@ -249,13 +255,15 @@ def interactive():
     parser = argparse.ArgumentParser(description='Execute unclaimed ips')
 
     # Add the arguments.
-    parser.add_argument('-d', '--domains', help='Path to domains file', dest='domains',
+    parser.add_argument('-d', '--domains', help='Full path to domains file', dest='domains',
                         required=True)
-    parser.add_argument('-r', '--ranges', help='Path to AWS ranges file', dest='ranges',
+    parser.add_argument('-o', '--output', help='Full path to output directory', dest='output',
                         required=True)
-    parser.add_argument('-cn', '--ssl-common-names', help='Path to common names (CN) file for exclusion', dest='common',
+    parser.add_argument('-r', '--ranges', help='Full path to AWS ranges file', dest='ranges',
                         required=True)
-    parser.add_argument('-i', '--ips', help='Path to owned IPs file', default='', dest='ips',
+    parser.add_argument('-cn', '--ssl-common-names', help='Full path to common names (CN) file for exclusion', dest='common',
+                        required=True)
+    parser.add_argument('-i', '--ips', help='Full path to owned IPs file', default='', dest='ips',
                         required=False)
     parser.add_argument('-v', '--skip-verify-ssl', help='Skip SSL verification for external HTTPS calls',
                         action='store_false', default=True, dest='verify', required=False)
@@ -265,7 +273,8 @@ def interactive():
          ranges_file=args.ranges,
          cns_file=args.common,
          ips_file=args.ips,
-         verify=args.verify
+         verify=args.verify,
+         output_path=args.output
          )
 
 
