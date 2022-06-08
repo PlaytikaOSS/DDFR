@@ -69,7 +69,7 @@ Short Form    | Long Form            | Description
 
 Domains file needs to be in the following format (JSON):
 ```json
-[{"name": "domain name", "record_type": "DNS type (CNAME,A)", "record_value": "value (ip,ec2 domain name)"}]
+[{"name": "domain name", "record_type": "DNS type (CNAME,A)", "record_value": "(ip,ec2 domain name)", "source": "dns management system/provider"}]
 ```
 
 ## Usage Examples
