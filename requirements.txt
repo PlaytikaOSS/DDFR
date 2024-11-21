@@ -1,2 +1,5 @@
-requests==2.25.1
+requests==2.32.3
 pyOpenSSL==22.0.0
+
+# Security Pinned
+certifi==2024.8.30 # not directly required, pinned by Snyk to avoid a vulnerability
